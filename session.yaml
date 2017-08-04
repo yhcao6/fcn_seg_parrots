@@ -1,0 +1,78 @@
+model:
+  py: /data/yhcao/parrots_vgg16_seg/vgg16.py
+snapshot_interval: 3000
+load_from: /data/yhcao/parrots_vgg16_seg/vgg16.parrots
+work_dir: work_dir
+max_iter: 10000
+init_missing: false
+
+# execute flow train and flow val alternately
+epoch:
+  - flow: train
+    policy: iterate
+    args:
+      iter_num: 1000    # total iter_num x batch_size samples
+      log_vars: [loss]
+      log_interval: 10
+  - flow: val
+    policy: iterate
+    args:
+      iter_num: 725    # 1000 iter_nums execute 1 test
+      log_vars: [loss]
+flows:
+  - train:
+      spec:
+        inputs: [data, label, label_weight]
+        outputs: [loss]
+        losses: [loss]
+      batch_size: 2
+      inner_iter: 5
+      devices: gpu(0:2) # other options: gpu(0) or gpu(0: 2)
+      learn:
+        lr: 0.001
+        weight_decay: 0.0005
+        # lr_policy: fixed
+        lr_policy: step(0.1, 3000)
+        updater:
+          type: sgd
+          momentum: 0.9
+      feeder:
+        pipeline:
+          - expr: "data, label, label_weight = seg_reader()"
+            attr:
+              source: /data/yhcao/VOC_arg/train.txt
+              data_root: /data/yhcao/VOC_arg
+              label_root: /data/yhcao/VOC_arg
+              is_shuffle: 1
+              is_mirror: 1
+  - val:
+      spec:
+        inputs: [data, label, label_weight]
+        outputs: [loss]
+        losses: [loss]
+      batch_size: 2 
+      devices: gpu(0:2) # other options: gpu(0) or gpu(0:2)
+      feeder:
+        pipeline:
+          - expr: "data, label, label_weight = seg_reader()"
+            attr:
+              source: /data/yhcao/VOC_arg/Lists/Img+Seg/val.txt
+              data_root: /data/yhcao/VOC_arg
+              label_root: /data/yhcao/VOC_arg
+              is_shuffle: 0 
+              is_mirror: 0 
+loggers:
+  - type: local
+  - type: pavi
+    args:
+      url: http://pavi.parrotsdnn.org/log
+      username: yhcao6 
+      password: Cyh1996418 
+
+extra:
+  custom_paths: ['/data/yhcao/parrots_vgg16_seg']
+  custom_modules: ['seg_reader']
+# record_best:
+#   val_flow: val
+#   field: accuracy
+#   factor: -1
