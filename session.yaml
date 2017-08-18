@@ -1,7 +1,7 @@
 model:
-  py: /data/yhcao/parrots_vgg16_seg/vgg16.py
+  py: /home/yhcao6/parrots_vgg16_seg/vgg16.py
 snapshot_interval: 3000
-load_from: /data/yhcao/parrots_vgg16_seg/vgg16.parrots
+load_from: /home/yhcao6/parrots_vgg16_seg/vgg16.parrots
 work_dir: work_dir
 max_iter: 10000
 init_missing: false
@@ -25,9 +25,9 @@ flows:
         inputs: [data, label, label_weight]
         outputs: [loss]
         losses: [loss]
-      batch_size: 2
-      inner_iter: 5
-      devices: gpu(0:2) # other options: gpu(0) or gpu(0: 2)
+      batch_size: 5
+      inner_iter: 2
+      devices: gpu(0:5) # other options: gpu(0) or gpu(0: 2)
       learn:
         lr: 0.001
         weight_decay: 0.0005
@@ -40,9 +40,9 @@ flows:
         pipeline:
           - expr: "data, label, label_weight = seg_reader()"
             attr:
-              source: /data/yhcao/VOC_arg/train.txt
-              data_root: /data/yhcao/VOC_arg
-              label_root: /data/yhcao/VOC_arg
+              source: /home/yhcao6/VOC_arg/train.txt
+              data_root: /home/yhcao6/VOC_arg
+              label_root: /home/yhcao6/VOC_arg
               is_shuffle: 1
               is_mirror: 1
   - val:
@@ -50,15 +50,15 @@ flows:
         inputs: [data, label, label_weight]
         outputs: [loss]
         losses: [loss]
-      batch_size: 2 
-      devices: gpu(0:2) # other options: gpu(0) or gpu(0:2)
+      batch_size: 5 
+      devices: gpu(0:5) # other options: gpu(0) or gpu(0:2)
       feeder:
         pipeline:
           - expr: "data, label, label_weight = seg_reader()"
             attr:
-              source: /data/yhcao/VOC_arg/Lists/Img+Seg/val.txt
-              data_root: /data/yhcao/VOC_arg
-              label_root: /data/yhcao/VOC_arg
+              source: /home/yhcao6/VOC_arg/Lists/Img+Seg/val.txt
+              data_root: /home/yhcao6/VOC_arg
+              label_root: /home/yhcao6/VOC_arg
               is_shuffle: 0 
               is_mirror: 0 
 loggers:
@@ -70,7 +70,7 @@ loggers:
       password: Cyh1996418 
 
 extra:
-  custom_paths: ['/data/yhcao/parrots_vgg16_seg']
+  custom_paths: ['/home/yhcao6/parrots_vgg16_seg']
   custom_modules: ['seg_reader']
 # record_best:
 #   val_flow: val
