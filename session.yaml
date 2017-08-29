@@ -63,11 +63,6 @@ flows:
               is_mirror: 0 
 loggers:
   - type: local
-  - type: pavi
-    args:
-      url: http://pavi.parrotsdnn.org/log
-      username: yhcao6 
-      password: Cyh1996418 
 
 extra:
   custom_paths: ['/home/yhcao6/parrots_vgg16_seg']
